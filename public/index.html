@@ -10,7 +10,8 @@
      initComponent: function() {
      this.storeReader = new Ext.data.JsonReader({
      //totalProperty: 'total',
-     //successProperty: 'success',
+     successProperty: 'success',
+     messageProperty: "message",
      idProperty: 'id',
      root: 'data',
      }, [
