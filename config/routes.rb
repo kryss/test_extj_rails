@@ -1,12 +1,14 @@
 TestExtjRails::Application.routes.draw do
-  get "note/new"
+  # get "note/new"
+  # 
+  # get "note/index"
+  # 
+  # get "note/delete"
+  # 
+  # get "note/update"
 
-  get "note/index"
-
-  get "note/delete"
-
-  get "note/update"
-
+  resources :note
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
