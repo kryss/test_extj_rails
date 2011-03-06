@@ -1,0 +1,92 @@
+<html>
+ <head>
+   <link rel="stylesheet" type="text/css" href="/extjs/resources/css/ext-all.css" />
+ </head>
+ <body>
+   <script type="text/javascript" src="/extjs/adapter/ext/ext-base.js"></script> 
+   <script type="text/javascript" src="/extjs/ext-all.js"></script>
+   <script type="text/javascript">
+     Main = Ext.extend(Ext.Viewport, {
+     initComponent: function() {
+     this.store = new Ext.data.JsonStore({
+     restful: true,
+     proxy: new Ext.data.HttpProxy({url:'/note'}),
+     writer: new Ext.data.JsonWriter({encode: false}),
+     root:"data",
+     storeId:"note-store",
+     idProperty:"id",
+     fields:["id", "name"]
+     });
+
+     this.noteView = {
+     xtype:"panel",
+     ref:"view",
+     items: {
+     html:""
+     }
+     };
+
+     this.noteForm = {
+     xtype:"form",
+     layout:"form",
+     ref:"../form",
+     items:[{
+     fieldLabel:"Name",
+     xtype:"textfield",
+     name:"name"
+     }]
+     };
+
+     var config = {
+     layout:"border",
+     items:[{
+     ref:"tab",
+     region: "center",
+     xtype:"tabpanel",
+     activeTab:0,
+     listeners:{
+     scope: this,
+     afterrender: this.onAfterRender
+     },
+     items:[{
+     title: "Contacts",
+     items:[this.noteView, this.noteForm],
+     tbar: {
+     xtype:"toolbar",
+     items:[{
+     xtype:"button",
+     text:"Save",
+     listeners: {
+     scope: this,
+     click: this.onSaveClick
+     }
+     }]
+     }
+     }, {
+     title: "Factures",
+     html: "rien"
+     }]
+     }]
+     };
+     Ext.apply(this, config);
+     Main.superclass.initComponent.apply(this);
+     },
+
+     onAfterRender: function() {
+     this.record = new this.store.recordType({
+     name:""
+     });
+     this.tab.form.getForm().loadRecord(this.record);
+     },
+
+     onSaveClick: function() {
+     this.tab.form.getForm().updateRecord(this.record);
+     this.store.add(this.record);
+     this.store.save();
+     }
+     });
+
+     main = new Main();
+   </script>
+ </body>
+</html>
