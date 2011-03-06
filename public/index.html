@@ -10,20 +10,23 @@
      initComponent: function() {
      this.store = new Ext.data.JsonStore({
      restful: true,
+     autoSave: false,
      proxy: new Ext.data.HttpProxy({url:'/note'}),
      writer: new Ext.data.JsonWriter({encode: false}),
      root:"data",
      storeId:"note-store",
      idProperty:"id",
-     fields:["id", "name"]
+     fields:["id", "name"],
+     listeners: {
+     scope: this,
+     save:this.onStoreSave
+     }
      });
 
      this.noteView = {
      xtype:"panel",
-     ref:"view",
-     items: {
-     html:""
-     }
+     ref:"../view",
+     tpl:"Note: {name}"
      };
 
      this.noteForm = {
@@ -34,6 +37,9 @@
      fieldLabel:"Name",
      xtype:"textfield",
      name:"name"
+     }, {
+     xtype:"hidden",
+     name:"id"
      }]
      };
 
@@ -50,6 +56,9 @@
      },
      items:[{
      title: "Contacts",
+     defaults: {
+     border: false
+     },
      items:[this.noteView, this.noteForm],
      tbar: {
      xtype:"toolbar",
@@ -83,6 +92,10 @@
      this.tab.form.getForm().updateRecord(this.record);
      this.store.add(this.record);
      this.store.save();
+     },
+
+     onStoreSave:function() {
+     this.tab.view.update(record.data);
      }
      });
 
