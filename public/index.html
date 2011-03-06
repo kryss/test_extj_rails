@@ -8,22 +8,31 @@
    <script type="text/javascript">
      Main = Ext.extend(Ext.Viewport, {
      initComponent: function() {
-     this.store = new Ext.data.JsonStore({
+     this.storeReader = new Ext.data.JsonReader({
+     //totalProperty: 'total',
+     //successProperty: 'success',
+     idProperty: 'id',
+     root: 'data',
+     }, [
+     {name: 'id'},
+     {name: 'name'},
+     ]);
+     this.store = new Ext.data.Store({
      restful: true,
+     autoSave: false,
      proxy: new Ext.data.HttpProxy({url:'/note'}),
      writer: new Ext.data.JsonWriter({encode: false}),
-     root:"data",
-     storeId:"note-store",
-     idProperty:"id",
-     fields:["id", "name"]
+     reader: this.storeReader,
+     listeners: {
+     scope: this,
+     save:this.onStoreSave
+     }
      });
 
      this.noteView = {
      xtype:"panel",
-     ref:"view",
-     items: {
-     html:""
-     }
+     ref:"../view",
+     tpl:"Note: {name}"
      };
 
      this.noteForm = {
@@ -34,6 +43,9 @@
      fieldLabel:"Name",
      xtype:"textfield",
      name:"name"
+     }, {
+     xtype:"hidden",
+     name:"id"
      }]
      };
 
@@ -50,6 +62,9 @@
      },
      items:[{
      title: "Contacts",
+     defaults: {
+     border: false
+     },
      items:[this.noteView, this.noteForm],
      tbar: {
      xtype:"toolbar",
@@ -83,6 +98,10 @@
      this.tab.form.getForm().updateRecord(this.record);
      this.store.add(this.record);
      this.store.save();
+     },
+
+     onStoreSave:function() {
+     this.tab.view.update(this.record.data);
      }
      });
 
